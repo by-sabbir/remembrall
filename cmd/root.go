@@ -6,7 +6,10 @@ package cmd
 import (
 	"os"
 
+	"github.com/by-sabbir/remembrall/db"
 	"github.com/spf13/cobra"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -23,8 +26,21 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+
 }
 
 func init() {
+	// initiate and migrate database
+	d, err := db.NewDBClient()
+	if err != nil {
+		log.Error("could not initiate database: ", err)
+		os.Exit(120)
+	}
+	if err := d.Migrate(); err != nil {
+		log.Warn("could not migrate database: ", err)
+	} else {
+		log.Info("db migrated successfully")
+	}
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }

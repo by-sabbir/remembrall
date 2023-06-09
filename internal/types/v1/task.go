@@ -1,14 +1,11 @@
 package v1
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
+import "time"
 
 type Task struct {
-	gorm.Model
-	Title    string
-	Status   string
-	Deadline time.Duration
+	ID        string
+	Title     string
+	Status    string
+	CreatedAt time.Time
+	Deadline  time.Duration
 }

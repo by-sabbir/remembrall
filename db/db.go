@@ -6,20 +6,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type Client struct {
-	DB *gorm.DB
+type DBClient struct {
+	Client *gorm.DB
 }
 
-func NewDBClient() (*Client, error) {
-	db, err := gorm.Open(sqlite.Open("task.db"), &gorm.Config{})
+func NewDBClient() (*DBClient, error) {
+	db, err := gorm.Open(sqlite.Open("task.sqlite"), &gorm.Config{})
 	if err != nil {
 		log.Error("could not open db", err)
-		return &Client{
-			DB: &gorm.DB{},
+		return &DBClient{
+			Client: &gorm.DB{},
 		}, err
 	}
-
-	return &Client{
-		DB: db,
+	return &DBClient{
+		Client: db,
 	}, nil
 }
