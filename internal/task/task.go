@@ -9,6 +9,7 @@ import (
 
 type TaskRepo interface {
 	AddTask(context.Context, *v1.Task) (*v1.Task, error)
+	ListTask(context.Context) ([]v1.Task, error)
 }
 
 type TaskService struct {
@@ -24,11 +25,21 @@ func NewTaskService(tp TaskRepo) *TaskService {
 func (ts TaskService) AddTask(ctx context.Context, t *v1.Task) (*v1.Task, error) {
 
 	createdTask, err := ts.Repo.AddTask(ctx, t)
-	log.Info("got task at internal: ", t)
 	if err != nil {
 		log.Error("could not create task: ", err)
 		return &v1.Task{}, err
 	}
 
 	return createdTask, nil
+}
+
+func (ts TaskService) ListTask(ctx context.Context) ([]v1.Task, error) {
+
+	allTasks, err := ts.Repo.ListTask(ctx)
+	if err != nil {
+		log.Error("could not fetch task: ", err)
+		return []v1.Task{}, err
+	}
+
+	return allTasks, nil
 }
