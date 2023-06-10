@@ -10,6 +10,7 @@ import (
 type TaskRepo interface {
 	AddTask(context.Context, *v1.Task) (*v1.Task, error)
 	ListTask(context.Context) ([]v1.Task, error)
+	RemoveTask(context.Context, int) error
 }
 
 type TaskService struct {
@@ -22,7 +23,7 @@ func NewTaskService(tp TaskRepo) *TaskService {
 	}
 }
 
-func (ts TaskService) AddTask(ctx context.Context, t *v1.Task) (*v1.Task, error) {
+func (ts *TaskService) AddTask(ctx context.Context, t *v1.Task) (*v1.Task, error) {
 
 	createdTask, err := ts.Repo.AddTask(ctx, t)
 	if err != nil {
@@ -33,7 +34,7 @@ func (ts TaskService) AddTask(ctx context.Context, t *v1.Task) (*v1.Task, error)
 	return createdTask, nil
 }
 
-func (ts TaskService) ListTask(ctx context.Context) ([]v1.Task, error) {
+func (ts *TaskService) ListTask(ctx context.Context) ([]v1.Task, error) {
 
 	allTasks, err := ts.Repo.ListTask(ctx)
 	if err != nil {
@@ -42,4 +43,13 @@ func (ts TaskService) ListTask(ctx context.Context) ([]v1.Task, error) {
 	}
 
 	return allTasks, nil
+}
+
+func (ts *TaskService) RemoveTask(ctx context.Context, id int) error {
+	err := ts.Repo.RemoveTask(ctx, id)
+	if err != nil {
+		log.Error("could not remove task: ", err)
+		return err
+	}
+	return nil
 }

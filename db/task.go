@@ -8,8 +8,8 @@ import (
 )
 
 func (d *DBClient) AddTask(ctx context.Context, t *v1.Task) (*v1.Task, error) {
-	d.Client.Create(t)
-	return t, nil
+	tx := d.Client.Create(t)
+	return t, tx.Error
 }
 
 func (d *DBClient) ListTask(ctx context.Context) ([]v1.Task, error) {
@@ -18,5 +18,13 @@ func (d *DBClient) ListTask(ctx context.Context) ([]v1.Task, error) {
 
 	log.Error(result.Error, result.RowsAffected)
 
-	return tasks, nil
+	return tasks, result.Error
+}
+
+func (d *DBClient) RemoveTask(ctx context.Context, id int) error {
+	var t v1.Task
+	t.ID = uint(id)
+	tx := d.Client.Delete(&t)
+
+	return tx.Error
 }
