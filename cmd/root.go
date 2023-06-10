@@ -38,8 +38,6 @@ func init() {
 	}
 	if err := d.Migrate(); err != nil {
 		log.Warn("could not migrate database: ", err)
-	} else {
-		log.Info("db migrated successfully")
 	}
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 

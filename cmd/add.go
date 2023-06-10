@@ -13,6 +13,7 @@ import (
 	"github.com/by-sabbir/remembrall/db"
 	"github.com/by-sabbir/remembrall/internal/task"
 	v1 "github.com/by-sabbir/remembrall/internal/types/v1"
+	"github.com/gen2brain/beeep"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
 
@@ -42,6 +43,7 @@ var addCmd = &cobra.Command{
 		}).AddInputField("Deadline(minutes)", "", 3, tview.InputFieldInteger, func(deadline string) {
 			d, err := strconv.Atoi(deadline)
 			t.Deadline = time.Duration(d) * time.Minute
+
 			fmt.Println("\tNotify in: ", t.Deadline)
 			if err != nil {
 				log.Error("please input a number")
@@ -81,12 +83,13 @@ func taskAdd(t *v1.Task) (*v1.Task, error) {
 	}
 
 	svc := task.NewTaskService(db)
-
 	createdTask, err := svc.AddTask(ctx, t)
 	if err != nil {
 		log.Error("could not create task: ", err)
 		return &v1.Task{}, err
 	}
-
+	if err := beeep.Alert(createdTask.Title, createdTask.Status, ""); err != nil {
+		log.Error("could not send notification: ", err)
+	}
 	return createdTask, nil
 }
