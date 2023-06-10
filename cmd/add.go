@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/by-sabbir/remembrall/db"
@@ -36,26 +37,33 @@ var addCmd = &cobra.Command{
 		tui := tview.NewApplication()
 
 		form := tview.NewForm().
-			AddInputField("Title", "", 32, nil, func(title string) {
+			AddInputField("Title", "", 80, nil, func(title string) {
 				t.Title = title
-			}).AddDropDown("Status", status, 0, func(option string, _ int) {
+			}).AddDropDown("Status", status, 1, func(option string, _ int) {
 			t.Status = option
+		}).AddInputField("Deadline(minutes)", "", 3, tview.InputFieldInteger, func(deadline string) {
+			d, err := strconv.Atoi(deadline)
+			t.Deadline = time.Duration(d) * time.Minute
+			fmt.Println("\tNotify in: ", t.Deadline)
+			if err != nil {
+				log.Error("please input a number")
+			}
 		}).AddButton("Done!", func() {
-			fmt.Println("Task Added: ", t)
-			time.Sleep(1 * time.Second)
+			fmt.Println("Task Id: ", t.ID)
+			createdTask, err := taskAdd(&t)
+			if err != nil {
+				log.Error("failed to create task: ", err)
+			} else {
+				log.Info("got task: ", t)
+				log.Info("task created successfully: ", createdTask)
+			}
 			tui.Stop()
 		})
+		form.SetBorder(true).SetTitle("Add a task").SetTitleAlign(tview.AlignCenter)
 		err := tui.SetRoot(form, true).EnableMouse(false).Run()
 		if err != nil {
 			log.Error("could not run tui")
 			os.Exit(1)
-		}
-		createdTask, err := taskAdd(&t)
-		if err != nil {
-			log.Error("failed to create task: ", err)
-		} else {
-			log.Info("got task: ", t)
-			log.Info("task created successfully: ", createdTask)
 		}
 
 	},
