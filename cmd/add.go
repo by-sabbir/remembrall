@@ -13,7 +13,6 @@ import (
 	"github.com/by-sabbir/remembrall/db"
 	"github.com/by-sabbir/remembrall/internal/task"
 	v1 "github.com/by-sabbir/remembrall/internal/types/v1"
-	"github.com/google/uuid"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
 
@@ -27,7 +26,6 @@ var addCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		var t v1.Task
-		t.ID = uuid.NewString()
 		t.CreatedAt = time.Now()
 		status := []string{"ToDo", "InProgress", "Done"}
 		// t.Deadline = 15 * time.Minute

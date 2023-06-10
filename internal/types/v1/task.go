@@ -3,7 +3,7 @@ package v1
 import "time"
 
 type Task struct {
-	ID        string
+	ID        uint
 	Title     string
 	Status    string
 	CreatedAt time.Time

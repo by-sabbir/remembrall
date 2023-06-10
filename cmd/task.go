@@ -5,10 +5,14 @@ package cmd
 
 import (
 	"context"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/by-sabbir/remembrall/db"
 	"github.com/by-sabbir/remembrall/internal/task"
 	v1 "github.com/by-sabbir/remembrall/internal/types/v1"
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -29,20 +33,52 @@ var taskCmd = &cobra.Command{
 			log.Error("list not found: ", err)
 		}
 		app := tview.NewApplication()
-		list := tview.NewList().ShowSecondaryText(false)
+		table := tview.NewTable().SetBorders(true)
+
+		headers := strings.Split("# Title Status Time-Remaining", " ")
+
+		for i, header := range headers {
+			table.SetCell(0, i,
+				tview.NewTableCell(header).
+					SetTextColor(tcell.ColorGreen).
+					SetAlign(tview.AlignCenter).
+					SetExpansion(100))
+		}
 
 		for i, task := range tasks {
+			remainingTime := task.Deadline - time.Since(task.CreatedAt)
+			id := strconv.Itoa(int(task.ID))
+			rowList := []string{
+				id, task.Title, task.Status, remainingTime.Truncate(1 * time.Minute).String(),
+			}
+			for c, item := range rowList {
+				table.SetCell(i+1, c,
+					tview.NewTableCell(item).
+						SetTextColor(tcell.ColorWhite).
+						SetAlign(tview.AlignCenter).
+						SetExpansion(100))
+			}
+		}
+		table.SetCell(len(tasks)+2, 3,
+			tview.NewTableCell("Press ESC to exit.").
+				SetTextColor(tcell.ColorYellow).
+				SetAlign(tview.AlignCenter).
+				SetExpansion(100))
+		table.Select(1, 0).SetFixed(1, 1).SetDoneFunc(func(key tcell.Key) {
+			if key == tcell.KeyEscape {
+				app.Stop()
+			}
+			if key == tcell.KeyEnter {
+				table.SetSelectable(true, true)
+			}
+		}).SetSelectedFunc(func(row int, column int) {
+			table.GetCell(row, 1).SetTextColor(tcell.ColorYellow)
+			table.SetSelectable(true, true)
+		})
+		if err := app.SetRoot(table, true).SetFocus(table).Run(); err != nil {
+			log.Error("could not build tui: ", err)
+		}
 
-			list.AddItem(task.Title, "", rune(97+i), func() {
-				idx := list.GetCurrentItem()
-				text := tasks[idx].Title + "\t\t" + tasks[idx].Status
-				list.SetItemText(list.GetCurrentItem(), text, "")
-			})
-		}
-		list.SetBorder(true).SetTitle("All Tasks").SetTitleAlign(tview.AlignCenter)
-		if err := app.SetRoot(list, true).EnableMouse(true).Run(); err != nil {
-			panic(err)
-		}
 	},
 }
 
