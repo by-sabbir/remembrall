@@ -25,5 +25,6 @@
 go.work
 *.sqlite
 *.db
+bin/
 # End of https://www.toptal.com/developers/gitignore/api/go
 n
