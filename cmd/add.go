@@ -13,6 +13,7 @@ import (
 	"github.com/by-sabbir/remembrall/db"
 	"github.com/by-sabbir/remembrall/internal/task"
 	v1 "github.com/by-sabbir/remembrall/internal/types/v1"
+	"github.com/gdamore/tcell/v2"
 	"github.com/gen2brain/beeep"
 	"github.com/rivo/tview"
 	log "github.com/sirupsen/logrus"
@@ -59,6 +60,7 @@ var addCmd = &cobra.Command{
 			}
 			tui.Stop()
 		})
+		form.SetBackgroundColor(tcell.ColorBlack.TrueColor())
 		form.SetBorder(true).SetTitle("Add a task").SetTitleAlign(tview.AlignCenter)
 		err := tui.SetRoot(form, true).EnableMouse(false).Run()
 		if err != nil {

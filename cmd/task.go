@@ -33,6 +33,7 @@ var taskCmd = &cobra.Command{
 			log.Error("list not found: ", err)
 		}
 		app := tview.NewApplication()
+
 		table := tview.NewTable().SetBorders(true)
 
 		headers := strings.Split("# Title Status Time-Remaining", " ")
@@ -41,6 +42,7 @@ var taskCmd = &cobra.Command{
 			table.SetCell(0, i,
 				tview.NewTableCell(header).
 					SetTextColor(tcell.ColorGreen).
+					SetBackgroundColor(tcell.ColorBlack.TrueColor()).
 					SetAlign(tview.AlignCenter).
 					SetExpansion(100))
 		}
@@ -55,13 +57,15 @@ var taskCmd = &cobra.Command{
 				table.SetCell(i+1, c,
 					tview.NewTableCell(item).
 						SetTextColor(tcell.ColorWhite).
+						SetBackgroundColor(tcell.ColorBlack.TrueColor()).
 						SetAlign(tview.AlignCenter).
 						SetExpansion(100))
 			}
 		}
-		table.SetCell(len(tasks)+2, 3,
+		table.SetCell(len(tasks)+1, 3,
 			tview.NewTableCell("Press ESC to exit.").
 				SetTextColor(tcell.ColorYellow).
+				SetBackgroundColor(tcell.ColorBlack.TrueColor()).
 				SetAlign(tview.AlignCenter).
 				SetExpansion(100))
 		table.Select(1, 0).SetFixed(1, 1).SetDoneFunc(func(key tcell.Key) {
