@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <me@sabbir.dev>
+Author   Sabbir Ahmed <me@sabbir.dev>
 */
 package cmd
 
